@@ -12,7 +12,6 @@ interface LocaleFunctionProps {
 
 interface MatchSearchFunctionProps extends LocaleFunctionProps {
   searchTerm: string;
-  tournament?: string;
 }
 
 export interface TreeNode extends LocaleFunctionProps {
@@ -91,9 +90,9 @@ const walk = ({ data, ...props }: WalkProps): Item[] => {
     : handleObject(validatedData);
 };
 
-const defaultMatchSearch = ({ label, tournament, searchTerm }: MatchSearchFunctionProps) => {
+const defaultMatchSearch = ({ label, searchTerm }: MatchSearchFunctionProps) => {
   const processString = (text: string): string => text.trim().toLowerCase();
-  return processString(label).includes(processString(searchTerm)) || processString(tournament || '').includes(processString(searchTerm));
+  return processString(label).includes(processString(searchTerm));
 };
 
 const defaultLocale = ({ label }: LocaleFunctionProps): string => label;
@@ -108,13 +107,12 @@ const generateBranch = ({
   const { parent, level, openNodes, searchTerm } = props;
 
   const { nodes, label: rawLabel = 'unknown', ...nodeProps } = node;
-  const { tournament } = nodeProps;
   const key = [parent, nodeName].filter(x => x).join('/');
   const hasNodes = validateData(nodes);
   const isOpen = hasNodes && (openNodes.includes(key) || !!searchTerm);
 
   const label = locale({ label: rawLabel, ...nodeProps });
-  const isVisible = !searchTerm || matchSearch({ label, tournament, searchTerm, ...nodeProps });
+  const isVisible = !searchTerm || matchSearch({ label, searchTerm, ...nodeProps });
   const currentItem = { ...props, ...nodeProps, label, hasNodes, isOpen, key };
 
   const data = getValidatedData(nodes);
